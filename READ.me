@@ -1,0 +1,82 @@
+To setup a 3 node apache kafka cluster using KRaft, use the server.properties files that are in the 3 folders i.e. ubuntu1, ubuntu2 and ubuntu3.
+
+The following properties in the files need to be changed -
+- controller.quorum.voters=1@192.168.1.199:9093,2@192.168.1.200:9093,3@192.168.1.181:9093
+    replace each of the IP addresses with the node ip addresses of the cluster
+- listeners=PLAINTEXT://192.168.1.199:9092,CONTROLLER://192.168.1.199:9093
+  advertised.listeners=PLAINTEXT://192.168.1.199:9092
+    replace the ip address with the ip address of host on which this config is located
+- log.dirs=/opt/kafka/logDir
+    specify the logDir for the node
+- num.partitions=6
+    multiple of 2 of the number of nodes
+- offsets.topic.replication.factor=2
+  transaction.state.log.replication.factor=2
+    changed them to 2
+
+Starting the cluster - https://kafka.apache.org/quickstart
+--------------------------------------------------------------
+Create a cluster ID for the kafka cluster using the following command on one of the nodes -
+
+KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
+
+Use this same ID to create an Env variable on the other nodes of the cluster
+
+export KAFKA_CLUSTER_ID=(cluster id from the node where it was run)
+
+Run the following commands on all the nodes to format log directoris - 
+bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
+
+Start the cluster on each nodes using the following command to check if the nodes can connect with each other -
+
+bin/kafka-server-start.sh config/kraft/server.properties
+
+Check the status of the cluster using the following command -
+./bin/kafka-metadata-quorum.sh --bootstrap-controller kafka1.your_domain:9093 describe --status  
+
+Create a topic using the following command - 
+./bin/kafka-topics.sh --create --topic first-topic --bootstrap-server kafka1.your_domain:9092 --replication-factor 2
+
+Describe the topic details -
+./bin/kafka-topics.sh --describe --bootstrap-server ubuntu1:9092 --topic first-topic
+
+To produce the data to the topic - 
+./bin/kafka-console-producer.sh --topic first-topic --bootstrap-server kafka1.your_domain:9092
+
+To read the data from the topic - 
+./bin/kafka-console-consumer.sh --topic first-topic --from-beginning --bootstrap-server kafka1.your_domain:9092
+
+
+To run kafka as systemd service, create the following file with contents
+
+/etc/systemd/system/kafka.service - 
+
+[Unit]
+Description=Kafka Service
+
+[Service]
+Type=forking
+User=godfrey
+Environment=KAFKA_HEAP_OPTS="-Xmx1G -Xms1G"
+Environment=KAFKA_JVM_PERFORMANCE_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent"
+ExecStart=/opt/kafka/kafka_2.13-3.8.0/bin/kafka-server-start.sh -daemon /opt/kafka/kafka_2.13-3.8.0/config/kraft/server.properties --override controller.mode=kraft
+ExecStop=/opt/kafka/kafka_2.13-3.8.0/bin/kafka-server-stop.sh /opt/kafka/kafka_2.13-3.8.0/config/kraft/server.properties --override controller.mode=kraft
+Restart=on-failure
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=default.target
+
+run the following commands to setup and enable the service
+systemctl daemon-reload
+systemctl enable kafka.service
+systemctl start kafka.service
+systemctl status kafka.service
+systemctl stop kafka.service
+
+
+
+References -
+Creating the cluster - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-multi-node-kafka-cluster-using-kraft
+Create the cluster from begining to end - https://github.com/inomera/kafka-3-cluster/blob/master/README.md
+
