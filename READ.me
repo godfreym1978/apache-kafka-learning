@@ -32,19 +32,19 @@ Start the cluster on each nodes using the following command to check if the node
 bin/kafka-server-start.sh config/kraft/server.properties
 
 Check the status of the cluster using the following command -
-./bin/kafka-metadata-quorum.sh --bootstrap-controller kafka1.your_domain:9093 describe --status  
+./bin/kafka-metadata-quorum.sh --bootstrap-controller 192.168.1.199:9093 describe --status  
 
 Create a topic using the following command - 
-./bin/kafka-topics.sh --create --topic first-topic --bootstrap-server kafka1.your_domain:9092 --replication-factor 2
+./bin/kafka-topics.sh --create --topic first-topic --bootstrap-server 192.168.1.199:9092 --replication-factor 2
 
 Describe the topic details -
-./bin/kafka-topics.sh --describe --bootstrap-server ubuntu1:9092 --topic first-topic
+./bin/kafka-topics.sh --describe --bootstrap-server 192.168.1.199:9092 --topic first-topic
 
 To produce the data to the topic - 
-./bin/kafka-console-producer.sh --topic first-topic --bootstrap-server kafka1.your_domain:9092
+./bin/kafka-console-producer.sh --topic first-topic --bootstrap-server 192.168.1.199:9092
 
 To read the data from the topic - 
-./bin/kafka-console-consumer.sh --topic first-topic --from-beginning --bootstrap-server kafka1.your_domain:9092
+./bin/kafka-console-consumer.sh --topic first-topic --from-beginning --bootstrap-server 192.168.1.199:9092
 
 
 To run kafka as systemd service, create the following file with contents
@@ -67,6 +67,7 @@ LimitNOFILE=infinity
 [Install]
 WantedBy=default.target
 
+---------------------------------------------------------
 run the following commands to setup and enable the service
 systemctl daemon-reload
 systemctl enable kafka.service
@@ -74,7 +75,54 @@ systemctl start kafka.service
 systemctl status kafka.service
 systemctl stop kafka.service
 
+---------------------------------------------------------
 
+To run the kafka connect service on each of the servers, create a systemd service configuration  /etc/systemd/system/kafkaconnect.service
+
+[Unit]
+Description=Kafka Connect Service
+
+[Service]
+Type=forking
+User=godfrey
+ExecStart=/opt/kafka/kafka_2.13-3.8.0/bin/connect-distributed.sh -daemon /opt/kafka/kafka_2.13-3.8.0/config/connect-distributed.properties
+ExecStop=/opt/kafka/kafka_2.13-3.8.0/bin/connect-distributed.sh /opt/kafka/kafka_2.13-3.8.0/config/connect-distributed.properties
+Restart=on-failure
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=default.target
+---------------------------------------------------------
+
+Create the following json file-in this case deb-jdbc-connector.json-to determine the configuration for Debezium mysql connector configuration - 
+{"name": "dataops-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "database.hostname": "192.168.1.204",
+        "database.port": "3306",
+        "database.user": "root",
+        "database.password": "password",
+        "database.server.id": "18406",
+        "topic.prefix": "dbserver1",
+        "database.include.list": "inventory",
+        "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
+        "schema.history.internal.kafka.topic": "schema-changes.inventory"
+    }
+}
+
+Create the connector -  curl -X POST -H "Content-Type: application/json" --data @deb-jdbc-connector.json http://192.168.1.199:8083/connectors
+
+List the connectors -  curl -H "Accept:application/json" http://192.168.1.199:8083/connectors/
+
+Delete the connector -  curl  -i -X DELETE  http://192.168.1.199:8083/connectors/dataops-connector
+
+
+
+To code in python install the kafka python libraries - 
+
+pip3 install kafka-python-ng
+
+To write producers and consumer - https://kafka-python.readthedocs.io/en/2.0.1/usage.html 
 
 References -
 Creating the cluster - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-multi-node-kafka-cluster-using-kraft
