@@ -1,0 +1,21 @@
+{
+    "name": "dataops-connector-3",
+    "config": {
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "tasks.max": "1",
+        "database.hostname": "192.168.1.205",
+        "database.port": "3306",
+        "database.user": "root",
+        "database.password": "password",
+        "database.server.id": "18423",
+        "database.server.name": "18423",
+        "topic.prefix": "dbserver1",
+        "database.include.list": "finance",
+        "table.include.list": "finance.inventory",
+        "after.state.only": "true",
+        "output.data.format": "JSON",
+        "output.key.format": "JSON",
+        "schema.history.internal.kafka.bootstrap.servers": "ubuntu1:9092,ubuntu2:9092,ubuntu3:9092",
+        "schema.history.internal.kafka.topic": "schema-changes.inventory"
+    }
+}

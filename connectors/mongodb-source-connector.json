@@ -1,0 +1,23 @@
+{
+    "name": "mongo-simple-source",
+    "config": {
+        "connector.class": "com.mongodb.kafka.connect.MongoSourceConnector",
+        "connection.uri": "mongodb://ubuntu1:27017,ubuntu2:27017,ubuntu3:27017",
+        "topic.prefix": "mongodb.",
+        "publish.full.document.only": true,
+        "connection.user": "root",
+        "connection.password": "ted970go877",
+        "change.stream.full.document": "default",
+        "change.stream.full.document.before.change": "default",
+        "output.data.format": "JSON",
+        "publish.full.document.only": "false",
+        "database": "test",
+        "collection": "employee",
+        "server.api.deprecation.errors": "false",
+        "server.api.strict": "false",
+        "tasks.max": "1",
+        "startup_mode": "copy_existing",
+        "pipeline":"[]"
+    }
+}
+
