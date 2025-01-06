@@ -1,0 +1,58 @@
+#It is recommended to put kafka/bin directory in the path variable in the profile to run these commands
+
+
+
+#create the topics in the cluster
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test1 --create
+
+#create the topics with partitions in the cluster
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --create --partitions 5
+
+#create the topics with partitions and replication factor in the cluster
+    kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --create --partitions 5 --replication-factor 3
+
+#list all the topics in the cluster
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --list
+
+#delete the topics in the cluster
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --delete --topic test
+
+
+#describe a topic in the cluster
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --describe
+
+#delete a topic
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --delete
+
+
+#send data to topic
+kafka-console-producer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2
+
+#send data to topic with acks
+kafka-console-producer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --producer-property acks=all
+
+#send data to topic with key
+kafka-console-producer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --property parse.key=true --property key.separator=:
+
+#send data to topic with round robin partition
+#not suggested way as this is very inefficient
+kafka-console-producer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner
+
+
+#consume data from topics
+kafka-console-consumer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 
+
+#consume data from topics and print more details
+kafka-console-consumer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning
+
+#consume data from topics and print more details, this time with consumer groups
+kafka-console-consumer.sh  --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning --group consumer-group-app
+
+#list consumer groups 
+kafka-consumer-groups.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --list
+
+#describe a specific consumer group
+kafka-consumer-groups.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --describe --group consumer-group-app
+
+#dry run with offsets reset, this will assist to read the messages from first.
+kafka-consumer-groups.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --group consumer-group-app --topic test3 --reset-offsets --to-earliest --dry-run
