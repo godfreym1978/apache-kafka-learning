@@ -1,0 +1,22 @@
+{
+    "name": "OpenSearchSink",
+    "config": {
+        "connection.url": "https://192.168.1.170:9200",
+        "connection.username": "elastic",
+        "connection.password": "ted970go877",
+        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+        "opensearch.ssl.enabled": "true",
+        "topics": "test_index",
+        "tasks.max": "1",
+        "auth.type": "BASIC",
+        "bahaviour.on.malformed.documents": "IGNORE",
+        "type.name": "kafka-connect",
+        "value.converter.schemas.enable": "false",
+        "key.converter.schemas.enable": "false",
+        "topic.schema.ignore": "test_index",
+        "topic.key.ignore": "test_index",
+        "elastic.security.protocol": "SSL",
+        "elastic.https.ssl.truststore.location": "/home/godfrey/cacerts",
+        "elastic.https.ssl.truststore.password": "changeit"
+    }
+}

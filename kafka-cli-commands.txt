@@ -1,7 +1,6 @@
 #It is recommended to put kafka/bin directory in the path variable in the profile to run these commands
 
 
-
 #create the topics in the cluster
 kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test1 --create
 
@@ -9,7 +8,7 @@ kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topi
 kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test2 --create --partitions 5
 
 #create the topics with partitions and replication factor in the cluster
-    kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --create --partitions 5 --replication-factor 3
+kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --topic test3 --create --partitions 5 --replication-factor 3
 
 #list all the topics in the cluster
 kafka-topics.sh --bootstrap-server ubuntu1:9092,ubuntu2:9092,ubuntu3:9092 --list

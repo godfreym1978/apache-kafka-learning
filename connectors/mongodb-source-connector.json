@@ -6,7 +6,7 @@
         "topic.prefix": "mongodb.",
         "publish.full.document.only": true,
         "connection.user": "root",
-        "connection.password": "ted970go877",
+        "connection.password": "password",
         "change.stream.full.document": "default",
         "change.stream.full.document.before.change": "default",
         "output.data.format": "JSON",
