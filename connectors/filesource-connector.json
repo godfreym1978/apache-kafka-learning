@@ -1,0 +1,13 @@
+{
+    "name": "FileDistributedSourceConnector",
+    "config": {
+        "connector.class": "org.apache.kafka.connect.file.FileStreamSourceConnector",
+        "key.converter.schemas.enable": "true",
+        "value.converter.schemas.enable": "true",
+        "file": "/home/godfrey/test.txt",
+        "tasks.max": "1",
+        "topic": "file.topic",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter"
+    }
+}

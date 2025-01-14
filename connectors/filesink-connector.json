@@ -1,0 +1,13 @@
+{
+    "name": "FileDistributedSinkConnector",
+    "config": {
+        "connector.class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+        "key.converter.schemas.enable": "false",
+        "value.converter.schemas.enable": "false",
+        "file": "/tmp/test.txt",
+        "tasks.max": "1",
+        "topics": "filetopic",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter"
+    }
+}
